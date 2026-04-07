@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s \"https://api.open-meteo.com/v1/forecast?latitude=48.1351&longitude=11.5820&hourly=precipitation&past_days=3&forecast_days=7&timezone=Europe%2FBerlin\")",
+      "Bash(curl -s \"https://www.hnd.bayern.de/pegel/isar/muenchen-16005701\" -A \"Mozilla/5.0\")",
+      "Bash(curl -s \"https://www.gkd.bayern.de/en/rivers/watertemperature/isar/muenchen-16005702/table\" -A \"Mozilla/5.0\")",
+      "mcp__plugin_figma_figma__get_metadata",
+      "mcp__plugin_figma_figma__get_design_context",
+      "Bash(curl -s \"https://www.gkd.bayern.de/webservices/gkd/messwerte/wassertemperatur/station/16005702/parameter/wassertemperatur/start/-2/end/0/json\" -A \"Mozilla/5.0\")",
+      "Bash(curl -s \"https://www.gkd.bayern.de/webservices/gkd/messwerte.php?messstelle=16005702&parameter=wassertemperatur&format=json\" -A \"Mozilla/5.0\")",
+      "Bash(curl -s \"https://www.gkd.bayern.de/webservices/messwerte/messstelle/16005702/kenngroesse/wassertemperatur/start/0/end/1\" -A \"Mozilla/5.0\")",
+      "Bash(curl -s \"https://www.hnd.bayern.de/pegel/isar/muenchen-16005701/abfluss\" -A \"Mozilla/5.0\")",
+      "Bash(curl -s \"https://www.gkd.bayern.de/webservices/gkd/messwerte/wassertemperatur/station/16005702/parameter/wassertemperatur/start/-1/end/0/json\" -A \"Mozilla/5.0\")",
+      "Bash(curl -s \"https://www.gkd.bayern.de/webservices/gkd/web/messwerte/wassertemperatur/zeitreihe/station/16005702\" -A \"Mozilla/5.0\")",
+      "Bash(curl -s \"https://www.gkd.bayern.de/js/lfu/script.20251126.js\")",
+      "Bash(curl -s \"https://www.gkd.bayern.de/de/fluesse/wassertemperatur/isar/muenchen-16005702/tabelle\" -A \"Mozilla/5.0\")",
+      "Bash(curl -s \"https://www.hnd.bayern.de/pegel/isar/muenchen-16005701/tabelle?methode=wasserstand&days=1\" -A \"Mozilla/5.0\")",
+      "Bash(curl -s \"https://www.gkd.bayern.de/webservices/gkd/json/messwerte/messstelle/16005702/parameter/wassertemperatur\" -A \"Mozilla/5.0\")",
+      "Bash(curl -s \"https://www.hnd.bayern.de/pegel/isar/muenchen-16005702/tabelle?methode=wassertemperatur\" -A \"Mozilla/5.0\")",
+      "Bash(curl -s \"https://www.hnd.bayern.de/pegel/isar/muenchen-16005702\" -A \"Mozilla/5.0\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://www.hnd.bayern.de/pegel/isar/muenchen-16005702\" -A \"Mozilla/5.0\")",
+      "Bash(curl -s \"https://www.gkd.bayern.de/files/flusswasser/wassertemperatur/isar/muenchen-16005702/tagesstatistik.csv\" -A \"Mozilla/5.0\")",
+      "Bash(curl -s \"https://www.gkd.bayern.de/webservices/gkd/messwerte?messstelle=16005702&methode=wassertemperatur&format=json\" -A \"Mozilla/5.0\")",
+      "Bash(curl -s \"https://www.gkd.bayern.de/webservices/gkd/aktuelle_messwerte?stationid=16005702\" -A \"Mozilla/5.0\")",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --app --no-src-dir --no-import-alias --eslint)",
+      "Read(//Users/abderrahmanehamila/Projects/**)",
+      "Bash(npx create-next-app@latest isarcheck --typescript --tailwind --app --no-src-dir --no-import-alias --eslint)"
+    ]
+  }
+}
