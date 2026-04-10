@@ -1,0 +1,174 @@
+"use client";
+
+import { Waves, Thermometer, FlaskConical, Wind, Sun, Droplets } from "lucide-react";
+import type { IsarData } from "@/lib/types";
+
+interface Props {
+  data: IsarData | undefined;
+  isLoading: boolean;
+}
+
+interface CardProps {
+  icon: React.ReactNode;
+  title: string;
+  value: string;
+  subtext: string;
+  statusColor: string;
+  statusLabel: string;
+}
+
+function DataCard({ icon, title, value, subtext, statusColor, statusLabel }: CardProps) {
+  return (
+    <div className="rounded-2xl p-4 sm:p-5" style={{ backgroundColor: "white" }}>
+      <div className="flex items-start justify-between mb-3">
+        <div>
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center"
+            style={{ backgroundColor: "var(--isar-teal)" + "18" }}
+          >
+            {icon}
+          </div>
+          <p
+            className="text-xs font-semibold uppercase tracking-wider mt-2"
+            style={{ color: "var(--isar-teal)" }}
+          >
+            {title}
+          </p>
+        </div>
+        <span
+          className="text-xs font-bold px-2 py-0.5 rounded-full"
+          style={{ backgroundColor: statusColor + "20", color: statusColor }}
+        >
+          {statusLabel}
+        </span>
+      </div>
+      <p className="text-3xl font-bold mb-1" style={{ color: "var(--isar-deep)" }}>
+        {value}
+      </p>
+      <p className="text-sm" style={{ color: "#6b7280" }}>
+        {subtext}
+      </p>
+    </div>
+  );
+}
+
+function SkeletonCard() {
+  return (
+    <div className="rounded-2xl p-4 sm:p-5 bg-white">
+      <div className="skeleton h-6 w-24 mb-3" />
+      <div className="skeleton h-10 w-20 mb-2" />
+      <div className="skeleton h-4 w-32" />
+    </div>
+  );
+}
+
+const BACTERIA_COLORS = { niedrig: "#52B788", mittel: "#F4A261", hoch: "#E63946" };
+const BACTERIA_LABELS = { niedrig: "Niedrig", mittel: "Mittel", hoch: "Hoch" };
+const FLOW_COLORS = { ruhig: "#52B788", moderat: "#F4A261", gefährlich: "#E63946" };
+const LEVEL_COLORS = { sicher: "#52B788", vorsicht: "#F4A261", gefährlich: "#E63946" };
+const TEMP_COLORS = { warm: "#52B788", angenehm: "#4EC9D4", kalt: "#F4A261", "zu kalt": "#E63946" };
+const TEMP_LABELS = { warm: "Warm", angenehm: "Angenehm", kalt: "Kalt", "zu kalt": "Zu kalt" };
+
+function getUVColor(uv: number) {
+  if (uv <= 2) return "#52B788";
+  if (uv <= 5) return "#F4A261";
+  if (uv <= 7) return "#E08A3C";
+  return "#E63946";
+}
+function getUVLabel(uv: number) {
+  if (uv <= 2) return "Niedrig";
+  if (uv <= 5) return "Moderat";
+  if (uv <= 7) return "Hoch";
+  return "Sehr hoch";
+}
+
+export default function DataCards({ data, isLoading }: Props) {
+  if (isLoading || !data) {
+    return (
+      <div className="grid grid-cols-2 gap-3 px-4">
+        <SkeletonCard />
+        <SkeletonCard />
+        <SkeletonCard />
+        <SkeletonCard />
+        <SkeletonCard />
+        <SkeletonCard />
+      </div>
+    );
+  }
+
+  const { water, temperature, weather, bacteriaRisk, flowLabel, tempLabel, levelLabel } = data;
+
+  const meldestufeLabelPart =
+    water.meldestufe > 0 ? ` · Meldestufe ${water.meldestufe}` : " · Normal";
+
+  const iconColor = "var(--isar-teal)";
+
+  return (
+    <div className="grid grid-cols-2 gap-3 px-4">
+      <DataCard
+        icon={<Waves className="w-5 h-5" style={{ color: iconColor }} />}
+        title="Wasserstand"
+        value={`${water.wasserstand} cm`}
+        subtext={`Isar München${meldestufeLabelPart}`}
+        statusColor={LEVEL_COLORS[levelLabel]}
+        statusLabel={
+          levelLabel === "sicher" ? "Normal" : levelLabel === "vorsicht" ? "Erhöht" : "Gefährlich"
+        }
+      />
+      <DataCard
+        icon={<Thermometer className="w-5 h-5" style={{ color: iconColor }} />}
+        title="Temperatur"
+        value={`${temperature.temperatur}°C`}
+        subtext={
+          temperature.stale
+            ? "Schätzwert (Quelle nicht erreichbar)"
+            : "Wassertemperatur Isar"
+        }
+        statusColor={TEMP_COLORS[tempLabel]}
+        statusLabel={TEMP_LABELS[tempLabel]}
+      />
+      <DataCard
+        icon={<FlaskConical className="w-5 h-5" style={{ color: iconColor }} />}
+        title="Bakterienrisiko"
+        value={BACTERIA_LABELS[bacteriaRisk]}
+        subtext={`Regen 24h: ${weather.rainLast24h}mm · 48h: ${weather.rainLast48h}mm`}
+        statusColor={BACTERIA_COLORS[bacteriaRisk]}
+        statusLabel={BACTERIA_LABELS[bacteriaRisk]}
+      />
+      <DataCard
+        icon={<Droplets className="w-5 h-5" style={{ color: iconColor }} />}
+        title="Strömung"
+        value={`${water.abfluss} m³/s`}
+        subtext="Abfluss am Pegel München"
+        statusColor={FLOW_COLORS[flowLabel]}
+        statusLabel={
+          flowLabel === "ruhig" ? "Ruhig" : flowLabel === "moderat" ? "Moderat" : "Stark"
+        }
+      />
+      <DataCard
+        icon={<Sun className="w-5 h-5" style={{ color: iconColor }} />}
+        title="UV-Index"
+        value={`${weather.uvIndexMax}`}
+        subtext="Tagesmaximum · Sonnenschutz beachten"
+        statusColor={getUVColor(weather.uvIndexMax)}
+        statusLabel={getUVLabel(weather.uvIndexMax)}
+      />
+      <DataCard
+        icon={<Wind className="w-5 h-5" style={{ color: iconColor }} />}
+        title="Wind"
+        value={`${weather.windSpeedMax} km/h`}
+        subtext="Maximaler Wind heute"
+        statusColor={
+          weather.windSpeedMax > 50
+            ? "#E63946"
+            : weather.windSpeedMax > 30
+            ? "#F4A261"
+            : "#52B788"
+        }
+        statusLabel={
+          weather.windSpeedMax > 50 ? "Stark" : weather.windSpeedMax > 30 ? "Moderat" : "Schwach"
+        }
+      />
+    </div>
+  );
+}

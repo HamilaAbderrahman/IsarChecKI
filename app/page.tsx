@@ -1,65 +1,84 @@
-import Image from "next/image";
+"use client";
+
+import Navbar from "@/components/Navbar";
+import HeroSection from "@/components/HeroSection";
+import VerdictHero from "@/components/VerdictHero";
+import DataCards from "@/components/DataCards";
+import SpotsList from "@/components/SpotsList";
+import AIBriefing from "@/components/AIBriefing";
+import AlertBanner from "@/components/AlertBanner";
+import WeekForecast from "@/components/WeekForecast";
+import EisbachCard from "@/components/EisbachCard";
+import AirQualityCard from "@/components/AirQualityCard";
+import Footer from "@/components/Footer";
+import { useIsarData, useVerdict } from "@/hooks/useIsarData";
 
 export default function Home() {
+  // Fast path: isar-data has no AI call — loads in ~500 ms
+  const { data: isarData, isLoading: isarLoading } = useIsarData();
+
+  // Slow path: verdict waits for Gemini — loads in 2–5 s
+  const { verdict, isLoading: verdictLoading } = useVerdict();
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ backgroundColor: "var(--bayern-cream)" }}
+    >
+      <Navbar />
+
+      {/* Hero — shows partial content instantly, verdict badge when AI ready */}
+      <HeroSection verdict={verdict} isLoading={verdictLoading} />
+
+      <main className="flex-1 max-w-2xl mx-auto w-full pb-8">
+        {/* Alert banner — only needs isar data, no AI */}
+        <div className="mt-4">
+          <AlertBanner data={isarData} />
+        </div>
+
+       {/* AI briefing — skeleton until Gemini responds */}
+        <div className="mt-6">
+          <AIBriefing verdict={verdict} isLoading={verdictLoading} />
+        </div>
+
+        {/* AI verdict card — skeleton until Gemini responds */}
+        <VerdictHero verdict={verdict} isLoading={verdictLoading} />
+
+        {/* Data grid — loads as soon as /api/isar-data responds */}
+        <div className="mt-4">
+          <DataCards data={isarData} isLoading={isarLoading} />
+        </div>
+
+        {/* Eisbach — loads with isar data, no AI needed */}
+        <div className="mt-6">
+          <EisbachCard data={isarData} isLoading={isarLoading} />
+        </div>
+
+        {/* Spots — shows chips immediately; AI recommendation fills in later */}
+        <div className="mt-6">
+          <SpotsList verdict={verdict} isarData={isarData} />
+        </div>
+
+        {/* Air quality & pollen — loads with isar data */}
+        <div className="mt-6">
+          <AirQualityCard data={isarData} isLoading={isarLoading} />
+        </div>
+
+        {/* 7-day forecast — loads with isar data */}
+        <div className="mt-6">
+          <WeekForecast data={isarData} isLoading={isarLoading} />
+        </div>
+
+        <div className="px-4 mt-6">
+          <p className="text-xs text-center" style={{ color: "#9ca3af" }}>
+            Daten aktualisieren sich alle 10 Minuten automatisch.
+            <br />
+            Quelle: HND Bayern · GKD Bayern · Open-Meteo · DWD · Copernicus CAMS · Google Gemini
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
       </main>
+
+      <Footer />
     </div>
   );
 }
