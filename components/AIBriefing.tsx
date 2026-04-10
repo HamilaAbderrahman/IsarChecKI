@@ -49,7 +49,6 @@ export default function AIBriefing({ verdict, isLoading }: Props) {
             <p className="text-sm font-bold" style={{ color: "var(--isar-deep)" }}>
               KI-Briefing
             </p>
-            <p className="text-xs text-gray-400">Powered by Google Gemini</p>
           </div>
         </div>
 

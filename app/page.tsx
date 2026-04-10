@@ -11,6 +11,7 @@ import WeekForecast from "@/components/WeekForecast";
 import EisbachCard from "@/components/EisbachCard";
 import AirQualityCard from "@/components/AirQualityCard";
 import Footer from "@/components/Footer";
+import BackgroundWaves from "@/components/BackgroundWaves";
 import { useIsarData, useVerdict } from "@/hooks/useIsarData";
 
 export default function Home() {
@@ -25,6 +26,12 @@ export default function Home() {
       className="min-h-screen flex flex-col"
       style={{ backgroundColor: "var(--bayern-cream)" }}
     >
+      {/* Fixed wave layer — z:0, behind the z:1 content wrapper below */}
+      <BackgroundWaves />
+
+      {/* z:1 creates a stacking context above the waves so content sits on top.
+          Transparent gaps between cards let the waves show through. */}
+      <div className="relative flex flex-col flex-1" style={{ zIndex: 1 }}>
       <Navbar />
 
       {/* Hero — shows partial content instantly, verdict badge when AI ready */}
@@ -79,6 +86,7 @@ export default function Home() {
       </main>
 
       <Footer />
+      </div>{/* end z:1 content wrapper */}
     </div>
   );
 }

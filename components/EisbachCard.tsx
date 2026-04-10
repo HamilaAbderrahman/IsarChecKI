@@ -106,17 +106,6 @@ export default function EisbachCard({ data, isLoading }: Props) {
             >
               {style.label}
             </span>
-            <a
-              href="https://maps.app.goo.gl/NW2RzqzDG8EgRDEF8"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs rounded-full px-2 py-1"
-              style={{ backgroundColor: "rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.9)" }}
-            >
-              <MapPin className="w-3 h-3" />
-              Maps
-              <ExternalLink className="w-2.5 h-2.5" />
-            </a>
           </div>
         </div>
 

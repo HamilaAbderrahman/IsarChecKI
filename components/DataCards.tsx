@@ -19,33 +19,48 @@ interface CardProps {
 
 function DataCard({ icon, title, value, subtext, statusColor, statusLabel }: CardProps) {
   return (
-    <div className="rounded-2xl p-4 sm:p-5" style={{ backgroundColor: "white" }}>
-      <div className="flex items-start justify-between mb-3">
-        <div>
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center"
-            style={{ backgroundColor: "var(--isar-teal)" + "18" }}
-          >
-            {icon}
-          </div>
-          <p
-            className="text-xs font-semibold uppercase tracking-wider mt-2"
-            style={{ color: "var(--isar-teal)" }}
-          >
-            {title}
-          </p>
-        </div>
-        <span
-          className="text-xs font-bold px-2 py-0.5 rounded-full"
-          style={{ backgroundColor: statusColor + "20", color: statusColor }}
+    <div className="rounded-2xl p-4 relative" style={{ backgroundColor: "white" }}>
+      {/* Row 1 — icon + big value side by side */}
+      <div className="flex items-center gap-2.5 mb-2">
+        <div
+          className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+          style={{ backgroundColor: statusColor + "18" }}
         >
-          {statusLabel}
-        </span>
+          {icon}
+        </div>
+        <p
+          className="text-2xl font-bold leading-none min-w-0"
+          style={{ color: "var(--isar-deep)" }}
+        >
+          {value}
+        </p>
       </div>
-      <p className="text-3xl font-bold mb-1" style={{ color: "var(--isar-deep)" }}>
-        {value}
+
+      {/* Row 2 — metric title */}
+      <p
+        className="text-xs font-semibold uppercase tracking-wider mb-2"
+        style={{ color: "var(--isar-teal)" }}
+      >
+        {title}
       </p>
-      <p className="text-sm" style={{ color: "#6b7280" }}>
+
+      {/* Status badge — pinned to top-right corner of the card */}
+      <span
+        className="text-xs font-bold px-2 py-0.5 rounded-full"
+        style={{
+          position: "absolute",
+          top: 10,
+          right: 10,
+          backgroundColor: statusColor + "18",
+          color: statusColor,
+          whiteSpace: "nowrap",
+        }}
+      >
+        {statusLabel}
+      </span>
+
+      {/* Row 4 — supporting subtext */}
+      <p className="text-xs mt-1.5 leading-tight" style={{ color: "#9ca3af" }}>
         {subtext}
       </p>
     </div>
@@ -54,10 +69,14 @@ function DataCard({ icon, title, value, subtext, statusColor, statusLabel }: Car
 
 function SkeletonCard() {
   return (
-    <div className="rounded-2xl p-4 sm:p-5 bg-white">
-      <div className="skeleton h-6 w-24 mb-3" />
-      <div className="skeleton h-10 w-20 mb-2" />
-      <div className="skeleton h-4 w-32" />
+    <div className="rounded-2xl p-4 bg-white">
+      <div className="flex items-center gap-2.5 mb-2">
+        <div className="skeleton w-8 h-8 rounded-lg flex-shrink-0" />
+        <div className="skeleton h-7 w-16" />
+      </div>
+      <div className="skeleton h-3 w-20 mb-2" />
+      <div className="skeleton h-5 w-14 rounded-full mb-1.5" />
+      <div className="skeleton h-3 w-28" />
     </div>
   );
 }

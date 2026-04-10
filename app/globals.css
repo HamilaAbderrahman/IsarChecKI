@@ -41,17 +41,6 @@ body {
   border-radius: 8px;
 }
 
-.verdict-sicher {
-  background: linear-gradient(135deg, #52B788 0%, #2A7F8A 100%);
-}
-
-.verdict-vorsicht {
-  background: linear-gradient(135deg, #F4A261 0%, #E08A3C 100%);
-}
-
-.verdict-meiden {
-  background: linear-gradient(135deg, #E63946 0%, #B02A33 100%);
-}
 
 .scrollbar-hide {
   -ms-overflow-style: none;
@@ -59,4 +48,33 @@ body {
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* ── Background wave animations ──────────────────────────────────────────── */
+/*
+  Two groups drift independently, giving the feel of a river surface
+  seen from above. Amplitudes are very small (a few CSS px) so the
+  effect stays discrete — barely perceptible until you look for it.
+*/
+
+@keyframes wave-drift-a {
+  0%,  100% { transform: translate(0px, 0px);   }
+  25%        { transform: translate(-5px, 1.5px); }
+  50%        { transform: translate(-2px, 3px);   }
+  75%        { transform: translate(4px,  1px);   }
+}
+
+@keyframes wave-drift-b {
+  0%,  100% { transform: translate(0px, 0px);   }
+  30%        { transform: translate(4px,  -2px);  }
+  60%        { transform: translate(-3px, 1px);   }
+  80%        { transform: translate(2px,  -1px);  }
+}
+
+.waves-a {
+  animation: wave-drift-a 28s ease-in-out infinite;
+}
+
+.waves-b {
+  animation: wave-drift-b 22s ease-in-out infinite;
 }
