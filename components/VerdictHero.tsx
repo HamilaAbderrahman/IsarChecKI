@@ -114,14 +114,33 @@ export default function VerdictHero({ verdict, isLoading }: Props) {
           <p className="text-white/70 text-sm font-semibold uppercase tracking-widest">
             {config.label}
           </p>
-          <h1 className="text-white text-2xl sm:text-3xl font-bold leading-tight">
+          <h2 className="text-white text-2xl sm:text-3xl font-bold leading-tight">
             {verdict.headline}
-          </h1>
+          </h2>
         </div>
       </div>
 
       {/* Summary */}
-      <p className="text-white/90 text-base leading-relaxed mb-6">{verdict.summary}</p>
+      <p className="text-white/90 text-base leading-relaxed mb-4">{verdict.summary}</p>
+
+      {/* Key factor chips */}
+      {verdict.keyFactors && verdict.keyFactors.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-5">
+          {verdict.keyFactors.map((factor, i) => (
+            <span
+              key={i}
+              className="inline-block px-2.5 py-1 rounded-full text-xs font-medium"
+              style={{
+                backgroundColor: "rgba(255,255,255,0.16)",
+                color: "rgba(255,255,255,0.88)",
+                border: "1px solid rgba(255,255,255,0.22)",
+              }}
+            >
+              {factor}
+            </span>
+          ))}
+        </div>
+      )}
 
       {/* Children ratings */}
       <div className="grid grid-cols-3 gap-2 mb-4">

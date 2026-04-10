@@ -46,7 +46,8 @@
       "WebFetch(domain:air-quality-api.open-meteo.com)",
       "Bash(ls /Users/abderrahmanehamila/Projects/IsarCheck/.env*)",
       "Bash(npm uninstall:*)",
-      "Bash(node -e \"const l = require\\('/Users/abderrahmanehamila/Projects/IsarCheck/node_modules/lucide-react'\\); console.log\\(['Baby','Siren','AlertOctagon','CloudSun','CloudRain','CloudSnow','CloudLightning','CloudFog','CloudDrizzle','Loader2','Info'].filter\\(k => k in l\\).join\\(', '\\)\\)\")"
+      "Bash(node -e \"const l = require\\('/Users/abderrahmanehamila/Projects/IsarCheck/node_modules/lucide-react'\\); console.log\\(['Baby','Siren','AlertOctagon','CloudSun','CloudRain','CloudSnow','CloudLightning','CloudFog','CloudDrizzle','Loader2','Info'].filter\\(k => k in l\\).join\\(', '\\)\\)\")",
+      "Bash(node -e \"const l = require\\('/Users/abderrahmanehamila/Projects/IsarCheck/node_modules/lucide-react'\\); console.log\\('ChevronDown' in l, 'ArrowDown' in l\\);\")"
     ]
   }
 }
