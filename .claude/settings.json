@@ -47,7 +47,12 @@
       "Bash(ls /Users/abderrahmanehamila/Projects/IsarCheck/.env*)",
       "Bash(npm uninstall:*)",
       "Bash(node -e \"const l = require\\('/Users/abderrahmanehamila/Projects/IsarCheck/node_modules/lucide-react'\\); console.log\\(['Baby','Siren','AlertOctagon','CloudSun','CloudRain','CloudSnow','CloudLightning','CloudFog','CloudDrizzle','Loader2','Info'].filter\\(k => k in l\\).join\\(', '\\)\\)\")",
-      "Bash(node -e \"const l = require\\('/Users/abderrahmanehamila/Projects/IsarCheck/node_modules/lucide-react'\\); console.log\\('ChevronDown' in l, 'ArrowDown' in l\\);\")"
+      "Bash(node -e \"const l = require\\('/Users/abderrahmanehamila/Projects/IsarCheck/node_modules/lucide-react'\\); console.log\\('ChevronDown' in l, 'ArrowDown' in l\\);\")",
+      "Bash(curl -sL \"https://www.gkd.bayern.de/js/lfu/script.20251126.js\")",
+      "Bash(curl -sL https://www.hnd.bayern.de/webservices/gkd/wassertemperatur/16005702/json -H 'User-Agent: Mozilla/5.0')",
+      "Bash(curl -sL https://www.hnd.bayern.de/webservices/gkd/Wassertemperatur/16005702 -H 'User-Agent: Mozilla/5.0')",
+      "Bash(curl -sL https://www.riverapp.net/en/station/muenchen-isar -H 'User-Agent: Mozilla/5.0')",
+      "Bash(grep -E '\\(Fehler 404|<td|[0-9]+[,\\\\.][0-9]+|\\\\d{2}\\\\.\\\\d{2}\\\\.\\\\d{4}\\)')"
     ]
   }
 }

@@ -81,6 +81,8 @@ function SkeletonCard() {
   );
 }
 
+const UNAVAILABLE_COLOR = "#9ca3af";
+
 const BACTERIA_COLORS = { niedrig: "#52B788", mittel: "#F4A261", hoch: "#E63946" };
 const BACTERIA_LABELS = { niedrig: "Niedrig", mittel: "Mittel", hoch: "Hoch" };
 const FLOW_COLORS = { ruhig: "#52B788", moderat: "#F4A261", gefährlich: "#E63946" };
@@ -127,24 +129,26 @@ export default function DataCards({ data, isLoading }: Props) {
       <DataCard
         icon={<Waves className="w-5 h-5" style={{ color: iconColor }} />}
         title="Wasserstand"
-        value={`${water.wasserstand} cm`}
-        subtext={`Isar München${meldestufeLabelPart}`}
-        statusColor={LEVEL_COLORS[levelLabel]}
+        value={water.stale ? "--" : `${water.wasserstand} cm`}
+        subtext={water.stale ? "Quelle nicht erreichbar" : `Isar München${meldestufeLabelPart}`}
+        statusColor={water.stale ? UNAVAILABLE_COLOR : LEVEL_COLORS[levelLabel]}
         statusLabel={
-          levelLabel === "sicher" ? "Normal" : levelLabel === "vorsicht" ? "Erhöht" : "Gefährlich"
+          water.stale
+            ? "N/V"
+            : levelLabel === "sicher"
+            ? "Normal"
+            : levelLabel === "vorsicht"
+            ? "Erhöht"
+            : "Gefährlich"
         }
       />
       <DataCard
         icon={<Thermometer className="w-5 h-5" style={{ color: iconColor }} />}
         title="Temperatur"
-        value={`${temperature.temperatur}°C`}
-        subtext={
-          temperature.stale
-            ? "Schätzwert (Quelle nicht erreichbar)"
-            : "Wassertemperatur Isar"
-        }
-        statusColor={TEMP_COLORS[tempLabel]}
-        statusLabel={TEMP_LABELS[tempLabel]}
+        value={temperature.stale ? "--" : `${temperature.temperatur}°C`}
+        subtext={temperature.stale ? "Quelle nicht erreichbar" : "Wassertemperatur Isar"}
+        statusColor={temperature.stale ? UNAVAILABLE_COLOR : TEMP_COLORS[tempLabel]}
+        statusLabel={temperature.stale ? "N/V" : TEMP_LABELS[tempLabel]}
       />
       <DataCard
         icon={<FlaskConical className="w-5 h-5" style={{ color: iconColor }} />}
@@ -157,11 +161,17 @@ export default function DataCards({ data, isLoading }: Props) {
       <DataCard
         icon={<Droplets className="w-5 h-5" style={{ color: iconColor }} />}
         title="Strömung"
-        value={`${water.abfluss} m³/s`}
-        subtext="Abfluss am Pegel München"
-        statusColor={FLOW_COLORS[flowLabel]}
+        value={water.stale ? "--" : `${water.abfluss} m³/s`}
+        subtext={water.stale ? "Quelle nicht erreichbar" : "Abfluss am Pegel München"}
+        statusColor={water.stale ? UNAVAILABLE_COLOR : FLOW_COLORS[flowLabel]}
         statusLabel={
-          flowLabel === "ruhig" ? "Ruhig" : flowLabel === "moderat" ? "Moderat" : "Stark"
+          water.stale
+            ? "N/V"
+            : flowLabel === "ruhig"
+            ? "Ruhig"
+            : flowLabel === "moderat"
+            ? "Moderat"
+            : "Stark"
         }
       />
       <DataCard

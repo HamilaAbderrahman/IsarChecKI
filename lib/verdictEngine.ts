@@ -101,12 +101,22 @@ export async function generateVerdict(data: IsarData): Promise<AIVerdict> {
 
   const { water, temperature, weather, eisbach, airQuality } = data;
 
-  const prompt = `Aktuelle Isardaten:
+  const unavailable: string[] = [];
+  if (temperature.stale) unavailable.push("Wassertemperatur");
+  if (water.stale) unavailable.push("Wasserstand", "Abfluss");
+
+  const unavailableNote =
+    unavailable.length > 0
+      ? `\n⚠️ NICHT VERFÜGBAR: ${unavailable.join(", ")} konnten nicht abgerufen werden. Weise in der "summary" AUSDRÜCKLICH darauf hin, dass diese Daten fehlen und die Einschätzung daher unvollständig ist.`
+      : "";
+
+  const prompt = `Aktuelle Isardaten:${unavailableNote}
 
 ISAR ALLGEMEIN (Pegel München, Station 16005701):
-- Wasserstand: ${water.wasserstand} cm (Meldestufe ${water.meldestufe})
-- Abfluss: ${water.abfluss} m³/s
-- Wassertemperatur: ${temperature.temperatur}°C${temperature.stale ? " (Schätzwert)" : ""}
+- Wasserstand: ${water.stale ? "NICHT VERFÜGBAR" : `${water.wasserstand} cm (Meldestufe ${water.meldestufe}) → App-Klassifizierung: ${data.levelLabel} (sicher <120 cm, vorsicht 120–150, gefährlich >150)`}
+- Abfluss: ${water.stale ? "NICHT VERFÜGBAR" : `${water.abfluss} m³/s → App-Klassifizierung: ${data.flowLabel} (ruhig <100, moderat 100–200, gefährlich >200)`}
+- Wassertemperatur: ${temperature.stale ? "NICHT VERFÜGBAR" : `${temperature.temperatur}°C → App-Klassifizierung: ${data.tempLabel} (warm ≥18°C, angenehm 14–17°C, kalt 10–13°C, zu kalt <10°C)`}
+- Bakterienrisiko: ${data.bacteriaRisk} (niedrig: Regen 24h <5 mm, mittel: 5–15 mm, hoch: >15 mm)
 
 EISBACH (Station Himmelreichbrücke 16515005 — direkt am Surfspot):
 - Wasserstand: ${eisbach.waterLevelCm ?? "n/v"} cm
@@ -123,6 +133,8 @@ LUFT & POLLEN (Copernicus CAMS + DWD):
 - Luftqualität (EU AQI): ${airQuality.europeanAQI} — ${airQuality.aqiLabel}
 - PM2.5: ${airQuality.pm25} μg/m³ · PM10: ${airQuality.pm10} μg/m³
 - Aktive Pollenbelastung: ${pollenSummary(data)}
+
+WICHTIGE REGEL: Deine keyFactors und summary MÜSSEN die App-Klassifizierungen oben widerspiegeln. Bezeichne Wassertemperatur NIEMALS als "angenehm" oder "warm" wenn die App-Klassifizierung "kalt" oder "zu kalt" ist. Bezeichne die Strömung NIEMALS als "moderat" oder "stark" wenn die App-Klassifizierung "ruhig" ist. childrenRating.under5 muss "vorsicht" oder "meiden" sein wenn Wassertemperatur <14°C oder Abfluss nicht "ruhig" ist.
 
 Erstelle eine Sicherheitseinschätzung als JSON:
 {

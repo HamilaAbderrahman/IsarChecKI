@@ -114,7 +114,9 @@ export function generateFallbackVerdict(data: IsarData): AIVerdict {
     factors.push(`Niedriges Bakterienrisiko`);
   }
 
-  if (temperature.temperatur < 10) {
+  if (temperature.stale) {
+    factors.push("Wassertemperatur nicht verfügbar – bitte vor Ort prüfen");
+  } else if (temperature.temperatur < 10) {
     verdict = verdict === "sicher" ? "vorsicht" : verdict;
     factors.push(`Sehr kaltes Wasser: ${temperature.temperatur}°C`);
   }
@@ -138,10 +140,18 @@ export function generateFallbackVerdict(data: IsarData): AIVerdict {
     meiden: "Besser heute nicht schwimmen",
   };
 
+  const tempNote = temperature.stale
+    ? " Die Wassertemperatur konnte nicht abgerufen werden – bitte vor Ort prüfen."
+    : "";
+  const waterNote = water.stale
+    ? " Wasserstand und Abfluss sind derzeit nicht verfügbar – Einschätzung unvollständig."
+    : "";
+  const dataNote = tempNote + waterNote;
+
   const summaries: Record<Verdict, string> = {
-    sicher: `Die Isar zeigt sich heute von ihrer besten Seite. Wasserstand bei ${water.wasserstand} cm, die Strömung ist ${flowLabel} und die Wassertemperatur liegt bei ${temperature.temperatur}°C. Perfekt für einen Familienausflug!`,
-    vorsicht: `Die Isar ist heute mit etwas Vorsicht genießbar. Wasserstand: ${water.wasserstand} cm, Strömung ${flowLabel}. Kinder sollten nur unter direkter Aufsicht ins Wasser.`,
-    meiden: `Heute sollte die Isar gemieden werden. ${factors[0]}. Bitte warten Sie bis sich die Bedingungen verbessert haben.`,
+    sicher: `Die Isar zeigt sich heute von ihrer besten Seite. Wasserstand bei ${water.stale ? "N/V" : `${water.wasserstand} cm`}, die Strömung ist ${water.stale ? "unbekannt" : flowLabel}${temperature.stale ? "" : ` und die Wassertemperatur liegt bei ${temperature.temperatur}°C`}. Perfekt für einen Familienausflug!${dataNote}`,
+    vorsicht: `Die Isar ist heute mit etwas Vorsicht genießbar. ${water.stale ? "Wasserstand und Abfluss nicht verfügbar." : `Wasserstand: ${water.wasserstand} cm, Strömung ${flowLabel}.`} Kinder sollten nur unter direkter Aufsicht ins Wasser.${dataNote}`,
+    meiden: `Heute sollte die Isar gemieden werden. ${factors[0]}. Bitte warten Sie bis sich die Bedingungen verbessert haben.${dataNote}`,
   };
 
   const tips: Record<Verdict, string> = {

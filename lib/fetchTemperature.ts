@@ -1,38 +1,41 @@
 import type { TemperatureData } from "./types";
 
+// Station 16005701 = München Isar (GKD Bayern)
+// Correct URL structure: /de/fluesse/wassertemperatur/kelheim/{name}-{id}/messwerte/tabelle
 const GKD_TABLE_URL =
-  "https://www.gkd.bayern.de/en/rivers/watertemperature/isar/muenchen-16005702/table";
+  "https://www.gkd.bayern.de/de/fluesse/wassertemperatur/kelheim/muenchen-16005701/messwerte/tabelle";
+
+// Station listing page — embeds current values as JSON in the map init script
+const GKD_LISTING_URL =
+  "https://www.gkd.bayern.de/de/fluesse/wassertemperatur";
+
+const STATION_ID = "16005701";
 
 let cache: { data: TemperatureData; fetchedAt: number } | null = null;
 const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+
+/** Parse German decimal: "8,3" → 8.3, "8.3" → 8.3 */
+function parseDE(s: string): number {
+  return parseFloat(s.replace(",", "."));
+}
 
 async function tryGKDTablePage(): Promise<number | null> {
   try {
     const html = await fetch(GKD_TABLE_URL, {
       headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+        "User-Agent": "Mozilla/5.0 (compatible; IsarChecKI/1.0)",
         Accept: "text/html,application/xhtml+xml",
         "Accept-Language": "de-DE,de;q=0.9",
-        Referer: "https://www.gkd.bayern.de/",
       },
       next: { revalidate: 1800 },
     }).then((r) => r.text());
 
-    // Try to extract temperature from table: "<td class="center">XX.X</td>"
+    // GKD table: <td class="center">8,3</td> (German comma notation)
     const tdMatch = html.match(
-      /class="center">\s*([\d]+\.[\d]+)\s*<\/td>/
+      /class="center">\s*([\d]+[,\.][\d]+)\s*<\/td>/
     );
     if (tdMatch) {
-      return parseFloat(tdMatch[1]);
-    }
-
-    // Try alternative pattern from Letzter Messwert (non-dotAll)
-    const lastMatch = html.match(
-      /Letzter Messwert[^<]*<b>([\d]+\.[\d]+)<\/b>/
-    );
-    if (lastMatch) {
-      return parseFloat(lastMatch[1]);
+      return parseDE(tdMatch[1]);
     }
 
     return null;
@@ -41,38 +44,31 @@ async function tryGKDTablePage(): Promise<number | null> {
   }
 }
 
-async function tryGKDWebservices(): Promise<number | null> {
-  // Try common GKD webservices URL patterns
-  const patterns = [
-    "https://www.gkd.bayern.de/webservices/gkd/messwerte/wassertemperatur/station/16005702/json",
-    "https://www.gkd.bayern.de/webservices/gkd/messwerte/station/16005702/parameter/wassertemperatur/json",
-    "https://www.gkd.bayern.de/webservices/messwerte/wassertemperatur/16005702/json",
-  ];
+async function tryGKDListingPage(): Promise<number | null> {
+  try {
+    const html = await fetch(GKD_LISTING_URL, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; IsarChecKI/1.0)",
+        Accept: "text/html,application/xhtml+xml",
+        "Accept-Language": "de-DE,de;q=0.9",
+      },
+      next: { revalidate: 1800 },
+    }).then((r) => r.text());
 
-  for (const url of patterns) {
-    try {
-      const resp = await fetch(url, {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; IsarChecKI/1.0)",
-          Referer: "https://www.gkd.bayern.de/",
-          "X-Requested-With": "XMLHttpRequest",
-        },
-        next: { revalidate: 1800 },
-      });
-      if (!resp.ok) continue;
-      const text = await resp.text();
-      if (text.includes("not found") || text.includes("DOCTYPE")) continue;
-      const data = JSON.parse(text);
-      if (Array.isArray(data) && data.length > 0) {
-        const last = data[data.length - 1];
-        const val = last?.value ?? last?.wert ?? last?.messwert;
-        if (val !== undefined) return parseFloat(val);
-      }
-    } catch {
-      continue;
+    // GKD listing page embeds current station data as JSON in the map init script:
+    // {"p":"16005701","n":"München",...,"w":"8,3"}
+    const re = new RegExp(
+      `"p":"${STATION_ID}"[^}]*"w":"([\\d,\\.]+)"`
+    );
+    const m = html.match(re);
+    if (m) {
+      return parseDE(m[1]);
     }
+
+    return null;
+  } catch {
+    return null;
   }
-  return null;
 }
 
 export async function fetchTemperature(): Promise<TemperatureData> {
@@ -81,10 +77,12 @@ export async function fetchTemperature(): Promise<TemperatureData> {
     return cache.data;
   }
 
-  // Try multiple sources
+  // 1. GKD table page (most reliable — actual measurement rows)
   let temp = await tryGKDTablePage();
+
+  // 2. GKD listing page (has current value embedded in map JSON)
   if (temp === null) {
-    temp = await tryGKDWebservices();
+    temp = await tryGKDListingPage();
   }
 
   if (temp !== null) {
@@ -96,12 +94,12 @@ export async function fetchTemperature(): Promise<TemperatureData> {
     return data;
   }
 
-  // Return cached stale data or default
+  // Return cached stale data or seasonal estimate
   if (cache) {
     return { ...cache.data, stale: true };
   }
 
-  // Seasonal estimate fallback (April in Munich: ~8-12°C)
+  // Seasonal estimate fallback (Munich Isar monthly averages)
   const month = new Date().getMonth();
   const seasonalEstimates = [4, 5, 7, 9, 14, 18, 20, 19, 16, 12, 8, 5];
   return {
