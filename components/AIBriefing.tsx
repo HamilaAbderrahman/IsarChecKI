@@ -1,6 +1,6 @@
 "use client";
 
-import { Bot, MapPin, Lightbulb, Info } from "lucide-react";
+import { Bot, MapPin, Lightbulb, Info, TriangleAlert, ExternalLink } from "lucide-react";
 import type { AIVerdict } from "@/lib/types";
 
 interface Props {
@@ -114,6 +114,61 @@ export default function AIBriefing({ verdict, isLoading }: Props) {
             "{verdict.tip}"
           </p>
         </div>
+
+        {/* Disclaimer */}
+        {(() => {
+          const d = new Date(verdict.updatedAt);
+          const ts = `${d.getDate().toString().padStart(2, "0")}.${(d.getMonth() + 1).toString().padStart(2, "0")}.${d.getFullYear()}, ${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")} Uhr`;
+          return (
+            <div
+              className="rounded-xl p-4 mt-4"
+              style={{ backgroundColor: "#fff8f0", border: "2px solid #f4a261" }}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <TriangleAlert className="w-4 h-4 flex-shrink-0" style={{ color: "#e07b2a" }} />
+                <p className="text-sm font-bold" style={{ color: "#e07b2a" }}>
+                  Wichtiger Hinweis: KI-generierte Einschätzung
+                </p>
+              </div>
+              <p className="text-xs leading-relaxed mb-3" style={{ color: "#7c5c3a" }}>
+                Diese Bewertung basiert auf aggregierten Datenquellen (Stand: {ts}). Sie spiegelt die{" "}
+                <strong>Realität nicht zu 100% wider</strong> und ersetzt keine offiziellen Warnungen!
+              </p>
+              <p className="text-xs font-bold mb-1.5" style={{ color: "#7c5c3a" }}>
+                Immer prüfen Sie vor dem Baden:
+              </p>
+              <ul className="space-y-1.5 mb-3">
+                <li>
+                  <a
+                    href="https://www.hnd.bayern.de/pegel/isar/muenchen-16005701"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-xs font-semibold underline"
+                    style={{ color: "#e07b2a" }}
+                  >
+                    <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                    HND Bayern: Aktueller Pegel Isar München
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://www.muenchen.de/aktuell/hochwasser-isar-pegel-badewarnung"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-xs font-semibold underline"
+                    style={{ color: "#e07b2a" }}
+                  >
+                    <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                    Stadt München: Hochwasser &amp; Badewarnungen
+                  </a>
+                </li>
+              </ul>
+              <p className="text-xs font-bold" style={{ color: "#7c5c3a" }}>
+                KI hilft, aber Ihre persönliche Verantwortung steht im Vordergrund – baden Sie sicher!
+              </p>
+            </div>
+          );
+        })()}
 
         {verdict.fallback && (
           <p className="text-xs text-gray-400 mt-3 flex items-center justify-center gap-1.5">
