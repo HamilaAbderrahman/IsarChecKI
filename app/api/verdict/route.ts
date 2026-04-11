@@ -30,7 +30,7 @@ export async function GET(_request: NextRequest) {
       { verdict, data },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=900, stale-while-revalidate=1800",
+          "Cache-Control": "no-store, no-cache, must-revalidate",
         },
       }
     );

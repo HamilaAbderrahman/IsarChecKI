@@ -172,7 +172,7 @@ export async function fetchAirQuality(): Promise<AirQualityData> {
     );
     url.searchParams.set("timezone", "Europe/Berlin");
 
-    const resp = await fetch(url.toString(), { next: { revalidate: 3600 } });
+    const resp = await fetch(url.toString(), { cache: "no-store" });
     if (!resp.ok) throw new Error(`Open-Meteo AQ HTTP ${resp.status}`);
 
     const json = await resp.json();
