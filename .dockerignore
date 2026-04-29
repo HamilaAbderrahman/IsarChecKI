@@ -1,0 +1,8 @@
+.git
+.gitea
+.next
+node_modules
+.env*
+*.md
+Dockerfile
+docker-compose.yml

@@ -1,0 +1,9 @@
+services:
+  isarcheck:
+    image: isarcheck:latest
+    container_name: isarcheck
+    restart: unless-stopped
+    ports:
+      - "3040:3000"
+    env_file:
+      - .env
