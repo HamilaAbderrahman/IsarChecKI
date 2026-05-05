@@ -13,15 +13,29 @@ export const metadata: Metadata = {
   title: "IsarChecKI — Sicher schwimmen in München",
   description:
     "Aktuelle KI-Sicherheitseinschätzung für die Isar in München. Wasserstand, Temperatur, Bakterienrisiko — für Familien mit Kindern.",
+  metadataBase: new URL("https://isar-checki.ahamila.de"),
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "IsarChecKI",
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
+  alternates: {
+    canonical: "https://isar-checki.ahamila.de",
+  },
   openGraph: {
     title: "IsarChecKI — Sicher schwimmen in München",
     description: "Ist die Isar heute sicher zum Baden?",
+    url: "https://isar-checki.ahamila.de",
+    siteName: "IsarChecKI",
     type: "website",
     locale: "de_DE",
   },
