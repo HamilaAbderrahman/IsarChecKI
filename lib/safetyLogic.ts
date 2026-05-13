@@ -1,4 +1,4 @@
-import type { IsarData, AIVerdict, Verdict, EisbachData, PollenData, AirQualityData } from "./types";
+import type { IsarData, AIVerdict, Verdict, EisbachData, EisbachSurfAssessment, PollenData, AirQualityData } from "./types";
 import type { IsarWaterData, WeatherData, TemperatureData } from "./types";
 
 export function computeBacteriaRisk(
@@ -35,24 +35,69 @@ export function computeLevelLabel(
 }
 
 /**
- * Eisbach surfability based on discharge at Himmelreichbrücke (station 16515005).
- * Falls back to München Pegel (16005701) discharge if Eisbach data unavailable.
- *
- * Optimal range: 50–85 m³/s (confirmed by Münchner surf community & historical data).
- *   - Below 35: wave too flat / non-existent
- *   - 35–50: wave starting to form, possible for advanced surfers
- *   - 50–85: ideal conditions
- *   - 85–120: strong wave, expert only
- *   - Above 120: too powerful, dangerous, wave closes
+ * Eisbach surfability based on water level (Pegel cm) at Himmelreichbrücke (station 16515005).
+ * Ground truth from Munich surf community:
+ *   <130 cm  → not surfable (wave absent or too flat)
+ *   130–139  → möglich, rock danger (very low water, stones exposed)
+ *   140–144  → möglich (low but rideable)
+ *   145–149  → ideal (perfect wave)
+ *   ≥150     → möglich (high water, wild, likely poor quality)
  */
 export function computeEisbachSurfable(
-  eisbachDischarge: number | null,
-  fallbackAbfluss: number
+  waterLevelCm: number | null
 ): "ideal" | "möglich" | "nicht surfbar" {
-  const q = eisbachDischarge ?? fallbackAbfluss;
-  if (q >= 50 && q <= 85) return "ideal";
-  if ((q >= 35 && q < 50) || (q > 85 && q <= 120)) return "möglich";
+  if (waterLevelCm === null) return "nicht surfbar";
+  if (waterLevelCm >= 145 && waterLevelCm < 150) return "ideal";
+  if (waterLevelCm >= 130) return "möglich";
   return "nicht surfbar";
+}
+
+/**
+ * Rich Eisbach assessment: skill level, water quality, smell risk, and brief text.
+ * Driven by water level (cm) and bacteria risk from rain data.
+ */
+export function computeEisbachAssessment(
+  waterLevelCm: number | null,
+  bacteriaRisk: "niedrig" | "mittel" | "hoch"
+): EisbachSurfAssessment {
+  let skillLevel: EisbachSurfAssessment["skillLevel"] = null;
+  if (waterLevelCm !== null && waterLevelCm >= 130) {
+    skillLevel =
+      waterLevelCm < 140 || waterLevelCm >= 150 ? "Experte" : "Fortgeschrittene";
+  }
+
+  const highWater = waterLevelCm !== null && waterLevelCm >= 150;
+  const waterQuality: EisbachSurfAssessment["waterQuality"] =
+    bacteriaRisk === "hoch" || highWater
+      ? "schlecht"
+      : bacteriaRisk === "mittel"
+      ? "fraglich"
+      : "gut";
+  const smellRisk = bacteriaRisk === "hoch" || highWater;
+
+  let briefText: string;
+  if (waterLevelCm === null) {
+    briefText =
+      "Pegeldaten nicht verfügbar — Surfbedingungen können nicht beurteilt werden.";
+  } else if (waterLevelCm < 130) {
+    briefText =
+      "Zu wenig Wasser — die Welle ist zu flach oder gar nicht vorhanden. Heute kein Surfen.";
+  } else if (waterLevelCm < 140) {
+    briefText = `Pegel ${waterLevelCm} cm: Welle vorhanden, aber Steine liegen frei. Hohe Verletzungsgefahr — nur für absolute Experten mit Risikobewusstsein.`;
+  } else if (waterLevelCm < 145) {
+    briefText = `Pegel ${waterLevelCm} cm: niedrige aber surfbare Welle. Technisch anspruchsvoll — für Fortgeschrittene geeignet.`;
+  } else if (waterLevelCm < 150) {
+    briefText = `Pegel ${waterLevelCm} cm: perfekte Bedingungen! Die Welle ist sauber und gut formiert. Für Fortgeschrittene und Experten.`;
+  } else {
+    briefText = `Pegel ${waterLevelCm} cm: hoher Wasserstand, kräftige Welle mit starker Strömung. Anfänger und Fortgeschrittene besser als Zuschauer bleiben.`;
+  }
+
+  if (smellRisk) {
+    briefText +=
+      " Achtung: nach Starkregen oder Hochwasser kann der Eisbach nach Kanalwasser riechen — Wasserqualität fraglich.";
+  }
+
+  return { skillLevel, waterQuality, smellRisk, briefText };
 }
 
 export function buildIsarData(
@@ -63,6 +108,7 @@ export function buildIsarData(
   pollen: PollenData,
   airQuality: AirQualityData
 ): IsarData {
+  const bacteriaRisk = computeBacteriaRisk(weather);
   return {
     water,
     temperature,
@@ -70,11 +116,12 @@ export function buildIsarData(
     eisbach,
     pollen,
     airQuality,
-    bacteriaRisk: computeBacteriaRisk(weather),
+    bacteriaRisk,
     flowLabel: computeFlowLabel(water.abfluss),
     tempLabel: computeTempLabel(temperature.temperatur),
     levelLabel: computeLevelLabel(water.wasserstand),
-    eisbachSurfable: computeEisbachSurfable(eisbach.dischargeM3s, water.abfluss),
+    eisbachSurfable: computeEisbachSurfable(eisbach.waterLevelCm),
+    eisbachAssessment: computeEisbachAssessment(eisbach.waterLevelCm, bacteriaRisk),
   };
 }
 

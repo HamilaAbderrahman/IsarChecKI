@@ -45,9 +45,9 @@ export const SPOTS: Spot[] = [
     surfSpot: true,
     coordinates: { lat: 48.1428, lng: 11.5863 },
     characteristics: ["Surf-Welle", "Starke Strömung", "Nur Profis", "Zuschauer willkommen"],
-    // Optimal Isar flow for Eisbach surfing: 50–85 m³/s
-    optimalFlowMin: 50,
-    optimalFlowMax: 85,
+    // Optimal Pegel range: 145–149 cm at station 16515005 (Himmelreichbrücke)
+    optimalFlowMin: 145,
+    optimalFlowMax: 149,
     mapsUrl: "https://maps.app.goo.gl/NW2RzqzDG8EgRDEF8",
   },
 ];

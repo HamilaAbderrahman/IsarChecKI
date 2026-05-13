@@ -40,11 +40,18 @@ export interface EisbachData {
   stationId: string;
   stationName: string;
   timestamp: string;
-  waterLevelCm: number | null;
-  dischargeM3s: number | null; // This is the key input for surf conditions
+  waterLevelCm: number | null; // Primary surf metric — Pegel in cm
+  dischargeM3s: number | null; // Secondary info only
   waterTemperatureC: number | null;
   source: string; // e.g. "HND Bayern, GKD Bayern"
   stale?: boolean;
+}
+
+export interface EisbachSurfAssessment {
+  skillLevel: "Experte" | "Fortgeschrittene" | null;
+  waterQuality: "gut" | "fraglich" | "schlecht";
+  smellRisk: boolean;
+  briefText: string;
 }
 
 // ── DWD Pollen (Pollenflug-Gefahrenindex) ─────────────────────────────────────
@@ -99,6 +106,7 @@ export interface IsarData {
   tempLabel: "warm" | "angenehm" | "kalt" | "zu kalt";
   levelLabel: "sicher" | "vorsicht" | "gefährlich";
   eisbachSurfable: "ideal" | "möglich" | "nicht surfbar";
+  eisbachAssessment: EisbachSurfAssessment;
 }
 
 export interface ChildrenRating {

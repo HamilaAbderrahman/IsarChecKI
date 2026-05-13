@@ -37,7 +37,7 @@ export default function SpotsList({ verdict, isarData }: Props) {
 
   const spot = SPOTS.find((s) => s.id === activeSpot) ?? SPOTS[0];
   const eisbachSurfable = isarData?.eisbachSurfable;
-  const abfluss = isarData?.water.abfluss;
+  const eisbachLevelCm = isarData?.eisbach.waterLevelCm;
 
   return (
     <div id="badestellen" className="px-4">
@@ -154,7 +154,7 @@ export default function SpotsList({ verdict, isarData }: Props) {
           </div>
 
           {/* Eisbach surfability panel */}
-          {spot.surfSpot && eisbachSurfable && abfluss !== undefined && (
+          {spot.surfSpot && eisbachSurfable && (
             <div
               className="rounded-xl p-3 mb-3"
               style={{
@@ -169,25 +169,28 @@ export default function SpotsList({ verdict, isarData }: Props) {
                     Surf-Bedingungen: {SURF_LABELS[eisbachSurfable]}
                   </span>
                 </div>
-                <span
-                  className="text-xs font-bold px-2 py-0.5 rounded-full"
-                  style={{
-                    backgroundColor: SURF_COLORS[eisbachSurfable] + "25",
-                    color: SURF_COLORS[eisbachSurfable],
-                  }}
-                >
-                  {abfluss} m³/s
-                </span>
+                {eisbachLevelCm !== null && eisbachLevelCm !== undefined && (
+                  <span
+                    className="text-xs font-bold px-2 py-0.5 rounded-full"
+                    style={{
+                      backgroundColor: SURF_COLORS[eisbachSurfable] + "25",
+                      color: SURF_COLORS[eisbachSurfable],
+                    }}
+                  >
+                    {eisbachLevelCm} cm
+                  </span>
+                )}
               </div>
               <p className="text-xs" style={{ color: "#6b7280" }}>
-                Optimaler Abfluss: 50–85 m³/s.{" "}
                 {eisbachSurfable === "ideal"
-                  ? "Aktuell perfekte Wellenbedingungen!"
+                  ? "Perfekte Wellenbedingungen! Pegel 145–149 cm — saubere, formierte Welle."
                   : eisbachSurfable === "möglich"
-                  ? "Welle vorhanden, aber nicht optimal."
-                  : abfluss < 35
-                  ? "Zu wenig Wasser — Welle zu flach."
-                  : "Zu viel Wasser — gefährlich für Surfer."}
+                  ? eisbachLevelCm != null && eisbachLevelCm < 140
+                    ? "Welle vorhanden, aber Steine liegen frei — Verletzungsgefahr."
+                    : eisbachLevelCm != null && eisbachLevelCm >= 150
+                    ? "Hoher Wasserstand — kräftige Welle, starke Strömung."
+                    : "Niedrige aber surfbare Welle — technisch anspruchsvoll."
+                  : "Zu wenig Wasser — Welle zu flach oder nicht vorhanden."}
               </p>
               <p className="text-xs font-medium mt-1.5 flex items-center gap-1" style={{ color: "#9ca3af" }}>
                 <AlertTriangle className="w-3 h-3 flex-shrink-0" />

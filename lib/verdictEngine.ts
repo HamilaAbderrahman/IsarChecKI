@@ -119,9 +119,10 @@ ISAR ALLGEMEIN (Pegel München, Station 16005701):
 - Bakterienrisiko: ${data.bacteriaRisk} (niedrig: Regen 24h <5 mm, mittel: 5–15 mm, hoch: >15 mm)
 
 EISBACH (Station Himmelreichbrücke 16515005 — direkt am Surfspot):
-- Wasserstand: ${eisbach.waterLevelCm ?? "n/v"} cm
-- Abfluss: ${eisbach.dischargeM3s ?? "n/v"} m³/s → Eisbach-Welle: ${data.eisbachSurfable} (optimal 50–85 m³/s)
+- Pegel: ${eisbach.waterLevelCm ?? "n/v"} cm → Eisbach-Welle: ${data.eisbachSurfable} (<130 nicht surfbar · 130–139 Steine/Gefahr · 140–144 niedrig surfbar · 145–149 perfekt · ≥150 stark/Qualität fraglich)
+- Abfluss: ${eisbach.dischargeM3s ?? "n/v"} m³/s (Sekundärinfo)
 - Wassertemperatur: ${eisbach.waterTemperatureC ?? "n/v"}°C
+- Wasserqualität: ${data.eisbachAssessment.waterQuality}${data.eisbachAssessment.smellRisk ? " — Geruch möglich nach Regen/Hochwasser" : ""}
 - Datenquelle: ${eisbach.source}
 
 WETTER:
@@ -147,7 +148,7 @@ Erstelle eine Sicherheitseinschätzung als JSON:
     "adults": "sicher" | "vorsicht" | "meiden"
   },
   "keyFactors": ["Faktor 1", "Faktor 2", "Faktor 3"],
-  "bestSpot": "Empfohlener Spot (Schwimmen: Flaucher, Thalkirchen, Großhesselohe, Maximiliansanlagen; Surfen: Eisbach wenn Abfluss 50–85 m³/s)",
+  "bestSpot": "Empfohlener Spot (Schwimmen: Flaucher, Thalkirchen, Großhesselohe, Maximiliansanlagen; Surfen: Eisbach wenn Pegel 145–149 cm)",
   "tip": "1 konkreter Tipp für heute inkl. Pollen/Luft wenn relevant (max 20 Wörter)"
 }`;
 
